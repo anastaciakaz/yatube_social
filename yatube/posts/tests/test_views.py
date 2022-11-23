@@ -19,6 +19,8 @@ TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostViewTest(TestCase):
+    cache.clear()
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -43,22 +45,16 @@ class PostViewTest(TestCase):
             content=cls.small_gif,
             content_type='image/gif'
         )
-
-        cls.posts = [
-            Post(
-                author=cls.author,
-                group=cls.group,
-                text='Тестовый текст',
-                image=cls.uploaded,
-            )
-            for i in range(13)
-        ]
-        Post.objects.bulk_create(cls.posts)
+        cls.post = Post.objects.create(
+            author=cls.author,
+            group=cls.group,
+            text='Тестовый текст',
+            image=cls.uploaded,
+        )
 
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.author)
-        cache.clear()
 
     @classmethod
     def tearDownClass(cls):
@@ -98,7 +94,7 @@ class PostViewTest(TestCase):
         self.assertEqual(post_text, 'Тестовый текст')
         self.assertEqual(post_author, 'test_user')
         self.assertEqual(group_title, 'Название')
-        self.assertEqual(len(response.context['page_obj']), 10)
+        self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_group_list_page_shows_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
@@ -112,7 +108,7 @@ class PostViewTest(TestCase):
         self.assertEqual(group_title, 'Название')
         self.assertEqual(group_description, 'Тестовое описание')
         self.assertEqual(group_slug, 'test-slug')
-        self.assertEqual(len(response.context['page_obj']), 10)
+        self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_profile_page_shows_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
@@ -178,7 +174,7 @@ class PostViewTest(TestCase):
         )
         for url in urls:
             response = self.authorized_client.get(url)
-            self.assertEqual(len(response.context['page_obj'].object_list), 10)
+            self.assertEqual(len(response.context['page_obj'].object_list), 1)
 
     def test_post_not_in_wrong_group(self):
         """Пост не попал в группу, для которой не был предназначен."""
@@ -204,11 +200,21 @@ class PostViewTest(TestCase):
         )
         for url in urls:
             response = self.authorized_client.get(url)
-            self.assertEqual(len(response.context['page_obj'].object_list), 10)
+            self.assertEqual(len(response.context['page_obj'].object_list), 1)
 
     def test_paginator(self):
         """На первой странице index, profile, group_list 10 постов,
         на второй странице 3 поста."""
+        posts = [
+            Post(
+                author=PostViewTest.author,
+                group=PostViewTest.group,
+                text='Тестовый текст',
+                image=PostViewTest.uploaded,
+            )
+            for i in range(12)
+        ]
+        Post.objects.bulk_create(posts)
         pages = (
             reverse('posts:index'),
             reverse('posts:group_list',
@@ -229,14 +235,15 @@ class PostViewTest(TestCase):
     def test_cache_index(self):
         """Тест кеширования главной страницы."""
         first_object = self.authorized_client.get(reverse('posts:index'))
-        post = Post.objects.get(id=1)
-        post.text = 'Изменённый текст'
-        post.save()
+        Post.objects.create(
+            text='Тест кэша',
+            author=PostViewTest.author
+        )
         second_object = self.authorized_client.get(reverse('posts:index'))
         self.assertEqual(first_object.content, second_object.content)
         cache.clear()
         third_object = self.authorized_client.get(reverse('posts:index'))
-        self.assertEqual(first_object.content, third_object.content)
+        self.assertNotEqual(first_object.content, third_object.content)
 
 
 class FollowingTests(TestCase):
@@ -258,6 +265,7 @@ class FollowingTests(TestCase):
         )
 
     def setUp(self):
+        self.guest_client = Client()
         self.authorized_client_unfollower = Client()
         self.authorized_client_unfollower.force_login(FollowingTests.user)
         self.authorized_client_author = Client()
@@ -285,6 +293,19 @@ class FollowingTests(TestCase):
         followers_now = Follow.objects.filter(author=self.author).count()
         self.authorized_client_follower.get(
             reverse('posts:profile_unfollow',
+                    kwargs={'username': self.follower})
+        )
+        followers_after = Follow.objects.filter(author=self.author).count()
+        self.assertEqual(followers_now, followers_after)
+
+    def test_guest_client_cant_follow(self):
+        """Неавторизованный пользователь не может подписываться
+        на авторов."""
+        followers_now = Follow.objects.filter(
+            author=FollowingTests.author
+        ).count()
+        self.guest_client.get(
+            reverse('posts:profile_follow',
                     kwargs={'username': self.follower})
         )
         followers_after = Follow.objects.filter(author=self.author).count()

@@ -156,7 +156,7 @@ class PostCreateFormTests(TestCase):
         self.assertRedirects(response, redirect_login)
 
     def test_comment_authorized_client_only(self):
-        """"комментировать посты может только авторизованный
+        """"Комментировать посты может только авторизованный
         пользователь."""
         comments_count = Comment.objects.count()
         form_data = {
@@ -173,3 +173,26 @@ class PostCreateFormTests(TestCase):
                 text='Комментарий авторизованного пользователя'
             ).exists()
         )
+
+    def test_no_comments_for_guest_clients(self):
+        """Неавторизованный пользователь не может коментировать
+        посты."""
+        comments_count = Comment.objects.count()
+        form_data = {
+            'text': 'Комментарий не авторизованного пользователя'
+        }
+        response = self.guest_client.post(
+            reverse('posts:add_comment', kwargs={'post_id': 1}),
+            data=form_data,
+            follow=True,
+        )
+        redirect_login = (reverse('login') + '?next='
+                          + reverse('posts:add_comment',
+                          kwargs={'post_id': 1}))
+        self.assertEqual(Comment.objects.count(), comments_count)
+        self.assertFalse(
+            Post.objects.filter(
+                text='Комментарий неавторизованного пользователя'
+            ).exists()
+        )
+        self.assertRedirects(response, redirect_login)

@@ -91,9 +91,11 @@ class PostViewTest(TestCase):
         post_text = first_object.text
         post_author = first_object.author.username
         group_title = first_object.group.title
+        post_image = first_object.image.name
         self.assertEqual(post_text, 'Тестовый текст')
         self.assertEqual(post_author, 'test_user')
         self.assertEqual(group_title, 'Название')
+        self.assertEqual(post_image, 'posts/small.gif')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_group_list_page_shows_correct_context(self):
@@ -105,9 +107,11 @@ class PostViewTest(TestCase):
         group_title = first_object.group.title
         group_description = first_object.group.description
         group_slug = first_object.group.slug
+        post_image = first_object.image.name
         self.assertEqual(group_title, 'Название')
         self.assertEqual(group_description, 'Тестовое описание')
         self.assertEqual(group_slug, 'test-slug')
+        self.assertEqual(post_image, 'posts/small.gif')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_profile_page_shows_correct_context(self):
@@ -118,8 +122,10 @@ class PostViewTest(TestCase):
         first_object = response.context['page_obj'][0]
         post_text = first_object.text
         post_author = first_object.author.username
+        post_image = first_object.image.name
         self.assertEqual(post_author, 'test_user')
         self.assertEqual(post_text, 'Тестовый текст')
+        self.assertEqual(post_image, 'posts/small.gif')
 
     def test_post_detail_page_shows_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
@@ -130,9 +136,11 @@ class PostViewTest(TestCase):
         post_text = first_object.text
         post_author = first_object.author.username
         group_title = first_object.group.title
+        post_image = first_object.image.name
         self.assertEqual(post_text, 'Тестовый текст')
         self.assertEqual(post_author, 'test_user')
         self.assertEqual(group_title, 'Название')
+        self.assertEqual(post_image, 'posts/small.gif')
 
     def test_edit_post_page_shows_correct_context(self):
         """Шаблон редактирования post_create сформирован

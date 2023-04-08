@@ -1,3 +1,38 @@
-# hw05_final
+# YATUBE_API
+### Описание проекта
+Этот проект является API социальной сети Yatube.
+С помощью YATUBE_API можно просматривать посты, комментарии, а также создавать свои. Есть возможность следить за любимыми авторами, подписавшись на них, а также творить самому и обретать последователей и единомышленников.
+### Технологии
+- Python 3.9.10
+- Django 3.2.14
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+### Автор
+Казанина Анастасия
+### Инструкции по запуску
+1) Клонируйте репозиторий себе на компьютер, выполнив команду в терминале:
+
+``` git clone https://github.com/anastaciakaz/hw05_final.git ```
+2) Откройте директорию с проектом и в терминале разверните виртуальное окружение проекта:
+```
+python -m venv venv
+```
+3) Запустите виртуальное окружение:
+```
+source venv/Scripts/activate
+```
+4) Обновите менеджер пакетов pip:
+```
+python -m pip install --upgrade pip
+```
+5) Установите зависимости:
+```
+pip install -r requirements.txt
+``` 
+6) Выполните миграции:
+```
+python manage.py migrate
+```
+7) Запустите сервер:
+```
+python manage.py runserver
+```

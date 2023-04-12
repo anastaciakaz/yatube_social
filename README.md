@@ -10,8 +10,9 @@
 Казанина Анастасия
 ### Инструкции по запуску
 1) Клонируйте репозиторий себе на компьютер, выполнив команду в терминале:
-
-``` git clone https://github.com/anastaciakaz/hw05_final.git ```
+``` 
+git clone https://github.com/anastaciakaz/hw05_final.git 
+```
 2) Откройте директорию с проектом и в терминале разверните виртуальное окружение проекта:
 ```
 python -m venv venv

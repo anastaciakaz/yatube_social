@@ -11,7 +11,7 @@ Your can create your own account and follow your favorite authors, leave comment
 ### How to start the project
 1) Clone the repository using this command in terminal:
 ```
-git clone https://github.com/anastaciakaz/hw05_final.git 
+git@github.com:anastaciakaz/yatube_social.git
 ```
 2) Open the directory with the project on your PC and creat a virtual environment using the following command in terminal:
 ```

@@ -1,6 +1,7 @@
 # YATUBE
 ### Project description
-YATUBE is a social networking site for sharing interesting ideas and finding friends. Your can create your own account and follow your favorite authors, leave comments on their pages and create your own content. 
+YATUBE is a social networking site for sharing interesting ideas and finding friends. 👥💬
+Your can create your own account and follow your favorite authors, leave comments on their pages and also create your own content. 📄📷🎨
 ### Technologies
 - Python 3.7
 - Django 2.2.16
